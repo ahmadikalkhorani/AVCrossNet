@@ -1,0 +1,10 @@
+model:
+  loss:
+    class_path: models.io.loss.Loss
+    init_args:
+      loss_func: models.io.loss.wav_mag
+      pit: true
+      loss_func_kwargs:
+        mixture_constraint: true
+        scale_invariant: false
+

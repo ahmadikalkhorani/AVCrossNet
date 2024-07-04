@@ -1,0 +1,9 @@
+data:
+  class_path: data_loaders.avss.AVSSDataModule
+  init_args:
+    dataset_dir: /path/to/datasett/directory/
+    config_dir: /path/to/datasett/directory/
+    sample_rate: 16000
+    audio_only: False
+    audio_time_len: [3.0,3.0,null]
+    dynamic_mix: true

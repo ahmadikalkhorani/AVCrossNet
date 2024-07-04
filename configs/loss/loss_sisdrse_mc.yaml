@@ -1,0 +1,10 @@
+model:
+  loss:
+    class_path: models.io.loss.Loss
+    init_args:
+      loss_func: models.io.loss.scale_invariant_signal_distortion_ratio
+      pit: true
+      loss_func_kwargs:
+        mixture_constraint: true
+        scale_invariant: true
+

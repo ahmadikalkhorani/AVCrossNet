@@ -1,0 +1,5 @@
+model:
+  loss:
+    class_path: models.io.loss.Loss
+    init_args:
+      pit: false

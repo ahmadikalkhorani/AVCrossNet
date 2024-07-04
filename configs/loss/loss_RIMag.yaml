@@ -1,0 +1,7 @@
+model:
+  loss:
+    class_path: models.io.loss.Loss
+    init_args:
+      loss_func: models.io.loss.RIMag
+      pit: true
+

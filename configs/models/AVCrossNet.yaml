@@ -1,0 +1,82 @@
+seed_everything: 2
+trainer:
+  gradient_clip_val: 5
+  gradient_clip_algorithm: norm
+  devices: null
+  accelerator: gpu
+  strategy: ddp_find_unused_parameters_false
+  sync_batchnorm: false
+  precision: "16-mixed"
+model:
+  arch:
+    class_path: models.arch.CrossNet_AV3.AVCrossNet
+    init_args:
+      dim_input: 3
+      dim_output: 2
+      num_layers: 12 # 12 for large
+      encoder_kernel_size: 5
+      dim_hidden: 192 # 192 for large
+      dim_ffn: 384 # 384 for large
+      num_heads: 4
+      dropout: [0, 0, 0]
+      kernel_size: [5, 3]
+      conv_groups: [2, 8]
+      norms: ["LN", "LN", "GN", "LN", "LN", "LN"]
+      dim_squeeze: 16 # 16 for large
+      num_freqs: 129
+      full_share: 0
+      positional_encoding: True
+      positional_encoding_type: lstm
+      positional_encoding_hidden_channels: 64 # 192 will work better probably
+      num_spks: 1
+  channels: [0]
+  ref_channel: 0
+  stft:
+    class_path: models.io.stft.STFT
+    init_args:
+      n_fft: 256
+      n_hop: 128
+  loss:
+    class_path: models.io.loss.Loss
+    init_args:
+      loss_func:
+        class_path: models.io.loss.MultiResolutionSTFTLoss
+        init_args:
+          fft_sizes:
+          - 1024
+          - 2048
+          - 512
+          hop_sizes:
+          - 120
+          - 240
+          - 50
+          win_lengths:
+          - 600
+          - 1200
+          - 240
+          window: hann_window
+      pit: true
+      loss_func_kwargs: {}
+  norm:
+    class_path: models.io.norm.Norm
+    init_args:
+      mode: frequency
+  optimizer: [Adam, { lr: 1E-3 }]
+  lr_scheduler: [ExponentialLR, { gamma: 0.99 }]
+  exp_name: exp
+  metrics: [SNR, SDR, SI_SDR, WB_PESQ, eSTOI]
+  val_metric: loss
+model_checkpoint:
+  dirpath: null
+  filename: epoch{epoch}_neg_si_sdr_{val/neg_si_sdr:.4f}
+  monitor: val/neg_si_sdr
+  verbose: false
+  save_last: true
+  save_top_k: 5
+  save_weights_only: false
+  mode: min
+  auto_insert_metric_name: false
+  every_n_train_steps: null
+  train_time_interval: null
+  every_n_epochs: 1
+  save_on_train_epoch_end: null
